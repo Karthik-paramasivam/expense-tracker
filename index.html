@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0369a1">
+    <title>ExpenseFlow - Expense Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100%; height: 100%; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f0f4f8 0%, #f8f9fc 100%); color: #1a202c; }
+        
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-bottom: none; padding: 16px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2); }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 24px; font-weight: 900; color: white; letter-spacing: -1px; }
+        .nav-info { font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 600; }
+        
+        .container { padding: 20px; padding-bottom: 30px; }
+        .page-header { margin-bottom: 28px; }
+        .page-title { font-size: 32px; font-weight: 900; color: #0f172a; margin-bottom: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .page-subtitle { font-size: 14px; color: #64748b; font-weight: 500; }
+        
+        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+        .kpi-card { background: white; border-radius: 20px; padding: 24px; transition: all 0.3s ease; position: relative; overflow: hidden; animation: slideIn 0.6s ease forwards; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); }
+        .kpi-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; border-radius: 50%; opacity: 0.15; }
+        .kpi-card::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; border-radius: 50%; opacity: 0.1; }
+        
+        .kpi-card:nth-child(1) { background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%); color: white; }
+        .kpi-card:nth-child(1)::before { background: #667eea; }
+        .kpi-card:nth-child(1)::after { background: #764ba2; }
+        
+        .kpi-card:nth-child(2) { background: linear-gradient(135deg, rgba(240,147,251,0.95) 0%, rgba(245,87,108,0.95) 100%); color: white; }
+        .kpi-card:nth-child(2)::before { background: #f093fb; }
+        .kpi-card:nth-child(2)::after { background: #f5576c; }
+        
+        .kpi-card:nth-child(3) { background: linear-gradient(135deg, rgba(79,172,254,0.95) 0%, rgba(0,242,254,0.95) 100%); color: white; }
+        .kpi-card:nth-child(3)::before { background: #4facfe; }
+        .kpi-card:nth-child(3)::after { background: #00f2fe; }
+        
+        .kpi-card:nth-child(4) { background: linear-gradient(135deg, rgba(67,233,123,0.95) 0%, rgba(56,249,215,0.95) 100%); color: white; }
+        .kpi-card:nth-child(4)::before { background: #43e97b; }
+        .kpi-card:nth-child(4)::after { background: #38f9d7; }
+        
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(0,0,0,0.12); }
+        .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 10px; opacity: 0.95; position: relative; z-index: 2; }
+        .kpi-value { font-size: 32px; font-weight: 900; margin-bottom: 6px; letter-spacing: -1px; position: relative; z-index: 2; }
+        .kpi-subtext { font-size: 12px; font-weight: 500; opacity: 0.9; position: relative; z-index: 2; }
+        
+        .card { background: white; border: 1px solid rgba(226,232,240,0.6); border-radius: 18px; padding: 24px; margin-bottom: 20px; animation: slideIn 0.6s ease forwards; box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+        .card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.1); border-color: rgba(226,232,240,0.9); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #f1f5f9; }
+        .card-title { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; }
+        
+        .chart-container { position: relative; height: 340px; margin-bottom: 20px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
+        .chart-wrapper { position: relative; height: 280px; }
+        
+        .form-wrapper { display: flex; flex-direction: column; gap: 18px; }
+        .form-group { margin: 0; width: 100%; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input, .form-select { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; display: block; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); background-color: #f8f9fc; }
+        .form-input::placeholder { color: #94a3b8; }
+        
+        .date-input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; box-sizing: border-box; }
+        .date-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); background-color: #f8f9fc; }
+        
+        .date-flex { display: flex; gap: 16px; }
+        .date-flex .form-group { flex: 0 0 90%; }
+        
+        .form-btn { width: 100%; padding: 14px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+        .form-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4); }
+        .form-btn:active { transform: scale(0.98); }
+        
+        .breakdown-list { display: flex; flex-direction: column; gap: 12px; }
+        .breakdown-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .breakdown-item:hover { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); transform: translateX(4px); }
+        .breakdown-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .breakdown-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .breakdown-name { font-weight: 700; color: #1a202c; font-size: 13px; }
+        .breakdown-percent { font-size: 11px; color: #64748b; margin-top: 2px; }
+        .breakdown-amount { font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 14px; min-width: 70px; text-align: right; }
+        
+        .filter-container { margin-bottom: 18px; overflow: hidden; }
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+        .filter-btn { padding: 10px 16px; border: 2px solid #e2e8f0; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0; transition: all 0.3s ease; }
+        .filter-btn:hover { border-color: #667eea; color: #667eea; }
+        .filter-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        
+        .transactions-list { display: flex; flex-direction: column; gap: 12px; }
+        .transaction-item { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .transaction-item:hover { background: white; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .transaction-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .transaction-content { display: flex; flex-direction: column; gap: 4px; }
+        .transaction-desc { font-weight: 700; color: #1a202c; font-size: 13px; }
+        .transaction-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .transaction-category-tag { display: inline-block; padding: 4px 10px; background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%); color: #667eea; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid rgba(102,126,234,0.2); }
+        .transaction-date { font-size: 11px; color: #64748b; white-space: nowrap; font-weight: 600; }
+        .transaction-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .transaction-amount { font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 14px; min-width: 55px; text-align: right; }
+        .delete-btn { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; transition: all 0.3s ease; }
+        .delete-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
+        
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-text { font-size: 13px; color: #64748b; margin: 0; font-weight: 600; }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 480px) {
+            .page-title { font-size: 28px; }
+            .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+            .container { padding: 16px; }
+            .card { padding: 18px; }
+            .chart-container { height: 300px; }
+            .chart-wrapper { height: 240px; }
+        }
+        
+        @supports (padding: max(0px)) {
+            .navbar { padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+            .container { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-container">
+            <div class="logo">₹ ExpenseFlow</div>
+            <div class="nav-info" id="dateInfo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Financial Overview</h1>
+            <p class="page-subtitle">Track your spending in Rupees</p>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Spent</div>
+                <div class="kpi-value" id="totalExpense">₹0</div>
+                <div class="kpi-subtext">All-time</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">This Month</div>
+                <div class="kpi-value" id="monthExpense">₹0</div>
+                <div class="kpi-subtext">Current</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Average</div>
+                <div class="kpi-value" id="avgExpense">₹0</div>
+                <div class="kpi-subtext">Per transaction</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Transactions</div>
+                <div class="kpi-value" id="totalCount">0</div>
+                <div class="kpi-subtext">Total recorded</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Spending by Category</h2>
+            </div>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Add Transaction</h2>
+            </div>
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" id="description" class="form-input" placeholder="e.g., Grocery Shopping">
+                </div>
+                <div class="date-flex">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" id="expenseDate" class="date-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Amount (₹)</label>
+                    <input type="number" id="amount" class="form-input" placeholder="0" min="0" step="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="category" class="form-select">
+                        <option value="Food">🍽️ Food & Dining</option>
+                        <option value="Transport">🚗 Transportation</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
+                        <option value="Health">🩺 Health</option>
+                        <option value="Shopping">🛍️ Shopping</option>
+                        <option value="Bills">💰 Utilities & Bills</option>
+                        <option value="Work">💼 Work</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+                <button class="form-btn" onclick="addExpense()">+ Add Transaction</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Category Breakdown</h2>
+            </div>
+            <div class="breakdown-list" id="breakdown">
+                <div class="empty-state" style="padding: 20px 0;">
+                    <p class="empty-text">No transactions yet</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Transactions</h2>
+            </div>
+            <div class="filter-container">
+                <div class="filter-bar" id="filterBar"></div>
+            </div>
+            <div class="transactions-list" id="transactionsList">
+                <div class="empty-state" style="padding: 30px 20px;">
+                    <div class="empty-icon">📊</div>
+                    <p class="empty-text">No transactions recorded. Add one to get started.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Spending Trends</h2>
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 18px; overflow-x: auto;">
+                <button class="filter-btn active" onclick="switchTrendView('monthly')" style="flex: 1;">📅 Monthly</button>
+                <button class="filter-btn" onclick="switchTrendView('weekly')" style="flex: 1;">📊 Weekly</button>
+                <button class="filter-btn" onclick="switchTrendView('yearly')" style="flex: 1;">📈 Yearly</button>
+            </div>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+            <div id="trendStats" style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                    <div style="text-align: center; padding: 12px;">
+                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Highest</div>
+                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="highestTrend">₹0</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px;">
+                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Average</div>
+                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="avgTrend">₹0</div>
+                    </div>
+                    <div style="text-align: center; padding: 12px;">
+                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Lowest</div>
+                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="lowestTrend">₹0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const categoryIcons = { 'Food': '🍽️', 'Transport': '🚗', 'Entertainment': '🎬', 'Health': '🩺', 'Shopping': '🛍️', 'Bills': '💰', 'Work': '💼', 'Other': '📌' };
+        const categoryColors = { 'Food': '#fbbf24', 'Transport': '#ef4444', 'Entertainment': '#ec4899', 'Health': '#10b981', 'Shopping': '#f59e0b', 'Bills': '#3b82f6', 'Work': '#8b5cf6', 'Other': '#6b7280' };
+        const chartColors = { 'Food': '#fbbf24', 'Transport': '#ef4444', 'Entertainment': '#ec4899', 'Health': '#10b981', 'Shopping': '#f59e0b', 'Bills': '#3b82f6', 'Work': '#8b5cf6', 'Other': '#6b7280' };
+
+        let expenses = [];
+        let selectedFilter = 'All';
+        let chartInstance = null;
+        let trendChartInstance = null;
+        let currentTrendView = 'monthly';
+        const STORAGE_KEY = 'expenseFlow_data_v3';
+
+        function saveExpenses() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+            } catch (e) {
+                console.error('Save error:', e);
+            }
+        }
+
+        function loadExpenses() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    expenses = JSON.parse(data);
+                    return;
+                }
+            } catch (e) {
+                console.error('Load error:', e);
+            }
+            expenses = [];
+        }
+
+        function formatCurrency(amount) {
+            return '₹' + Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function updateDate() {
+            const now = new Date();
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            document.getElementById('dateInfo').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        function setDefaultDate() {
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function addExpense() {
+            const description = document.getElementById('description').value.trim();
+            const amount = parseInt(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const expenseDate = document.getElementById('expenseDate').value;
+
+            if (!description || !amount || amount <= 0 || !expenseDate) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            expenses.unshift({
+                id: Date.now(),
+                description,
+                amount,
+                category,
+                date: formatDate(expenseDate),
+                displayDate: expenseDate,
+                timestamp: new Date(expenseDate).toISOString()
+            });
+
+            saveExpenses();
+            updateUI();
+            document.getElementById('description').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('category').value = 'Food';
+            setDefaultDate();
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(e => e.id !== id);
+            saveExpenses();
+            updateUI();
+        }
+
+        function filterCategory(category) {
+            selectedFilter = category;
+            renderFilterButtons();
+            updateTransactions();
+        }
+
+        function switchTrendView(view) {
+            currentTrendView = view;
+            document.querySelectorAll('[onclick*="switchTrendView"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            updateTrendChart();
+        }
+
+        function renderFilterButtons() {
+            const categories = ['All', 'Food', 'Transport', 'Entertainment', 'Health', 'Shopping', 'Bills', 'Work', 'Other'];
+            let html = '';
+            categories.forEach(cat => {
+                html += `<button class="filter-btn ${selectedFilter === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>`;
+            });
+            document.getElementById('filterBar').innerHTML = html;
+        }
+
+        function getMonthlyTrends() {
+            const trends = {};
+            expenses.forEach(e => {
+                const date = new Date(e.timestamp);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                trends[monthKey] = (trends[monthKey] || 0) + e.amount;
+            });
+            return Object.entries(trends)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .slice(-12)
+                .map(([month, amount]) => {
+                    const [year, monthNum] = month.split('-');
+                    const monthName = new Date(year, monthNum - 1).toLocaleDateString('en-US', {month: 'short'});
+                    return {label: monthName, amount};
+                });
+        }
+
+        function getWeeklyTrends() {
+            const trends = {};
+            expenses.forEach(e => {
+                const date = new Date(e.timestamp);
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                const weekKey = weekStart.toISOString().split('T')[0];
+                trends[weekKey] = (trends[weekKey] || 0) + e.amount;
+            });
+            return Object.entries(trends)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .slice(-12)
+                .map(([week, amount]) => {
+                    const date = new Date(week);
+                    const endDate = new Date(date);
+                    endDate.setDate(endDate.getDate() + 6);
+                    return {label: `${date.getDate()}-${endDate.getDate()} ${date.toLocaleDateString('en-US', {month: 'short'})}`, amount};
+                });
+        }
+
+        function getYearlyTrends() {
+            const trends = {};
+            expenses.forEach(e => {
+                const year = new Date(e.timestamp).getFullYear();
+                trends[year] = (trends[year] || 0) + e.amount;
+            });
+            return Object.entries(trends)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([year, amount]) => ({label: year, amount}));
+        }
+
+        function updateTrendChart() {
+            let trendData = [];
+            if (currentTrendView === 'monthly') trendData = getMonthlyTrends();
+            else if (currentTrendView === 'weekly') trendData = getWeeklyTrends();
+            else trendData = getYearlyTrends();
+
+            const labels = trendData.map(t => t.label);
+            const data = trendData.map(t => t.amount);
+
+            if (!labels.length) {
+                document.getElementById('highestTrend').textContent = '₹0';
+                document.getElementById('avgTrend').textContent = '₹0';
+                document.getElementById('lowestTrend').textContent = '₹0';
+                if (trendChartInstance) {
+                    trendChartInstance.data.labels = [];
+                    trendChartInstance.data.datasets[0].data = [];
+                    trendChartInstance.update();
+                }
+                return;
+            }
+
+            const highest = Math.max(...data);
+            const lowest = Math.min(...data);
+            const avg = Math.round(data.reduce((a, b) => a + b, 0) / data.length);
+
+            document.getElementById('highestTrend').textContent = formatCurrency(highest);
+            document.getElementById('avgTrend').textContent = formatCurrency(avg);
+            document.getElementById('lowestTrend').textContent = formatCurrency(lowest);
+
+            const ctx = document.getElementById('trendChart');
+            if (trendChartInstance) {
+                trendChartInstance.data.labels = labels;
+                trendChartInstance.data.datasets[0].data = data;
+                trendChartInstance.update();
+            } else {
+                trendChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Spending (₹)',
+                            data: data,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.08)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 3,
+                            pointRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 12, family: "'Plus Jakarta Sans'" },
+                                    color: '#64748b',
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                },
+                                grid: {
+                                    color: 'rgba(100, 116, 139, 0.1)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateUI() {
+            const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+            const now = new Date();
+            const monthExpenses = expenses.filter(e => {
+                const expDate = new Date(e.timestamp);
+                return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear();
+            });
+            const monthTotal = monthExpenses.reduce((sum, e) => sum + e.amount, 0);
+            const avg = expenses.length > 0 ? Math.round(total / expenses.length) : 0;
+
+            document.getElementById('totalExpense').textContent = formatCurrency(total);
+            document.getElementById('monthExpense').textContent = formatCurrency(monthTotal);
+            document.getElementById('avgExpense').textContent = formatCurrency(avg);
+            document.getElementById('totalCount').textContent = expenses.length;
+            updateBreakdown();
+            updateTransactions();
+            updateChart();
+            updateTrendChart();
+        }
+
+        function updateChart() {
+            const categoryTotals = {};
+            expenses.forEach(e => {
+                categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+            });
+
+            const labels = Object.keys(categoryTotals);
+            const data = Object.values(categoryTotals);
+            const colors = labels.map(cat => chartColors[cat]);
+
+            const ctx = document.getElementById('categoryChart');
+            
+            if (chartInstance) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = data;
+                chartInstance.data.datasets[0].backgroundColor = colors;
+                chartInstance.update();
+            } else if (labels.length > 0) {
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Amount Spent (₹)',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                            borderWidth: 2,
+                            borderRadius: 10,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 12, family: "'Plus Jakarta Sans'" },
+                                    color: '#64748b',
+                                    padding: 15,
+                                    usePointStyle: true,
+                                    boxWidth: 12
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                },
+                                grid: {
+                                    color: 'rgba(100, 116, 139, 0.1)',
+                                    drawBorder: false
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 12, family: "'Plus Jakarta Sans'", weight: 'bold' }
+                                },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateBreakdown() {
+            const categoryTotals = {};
+            const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+            expenses.forEach(e => {
+                categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
+            });
+
+            if (Object.keys(categoryTotals).length === 0) {
+                document.getElementById('breakdown').innerHTML = '<div class="empty-state" style="padding: 20px 0;"><p class="empty-text">No transactions yet</p></div>';
+                return;
+            }
+
+            let html = '';
+            Object.entries(categoryTotals)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([cat, amount]) => {
+                    const percent = total > 0 ? ((amount / total) * 100).toFixed(0) : 0;
+                    html += `<div class="breakdown-item"><div class="breakdown-left"><div class="breakdown-icon" style="background: ${categoryColors[cat]}20;">${categoryIcons[cat]}</div><div><div class="breakdown-name">${cat}</div><div class="breakdown-percent">${percent}% of total</div></div></div><div class="breakdown-amount">${formatCurrency(amount)}</div></div>`;
+                });
+            document.getElementById('breakdown').innerHTML = html;
+        }
+
+        function updateTransactions() {
+            const filtered = selectedFilter === 'All' ? expenses : expenses.filter(e => e.category === selectedFilter);
+
+            if (filtered.length === 0) {
+                document.getElementById('transactionsList').innerHTML = `<div class="empty-state" style="padding: 30px 20px;"><div class="empty-icon">📊</div><p class="empty-text">${selectedFilter === 'All' ? 'No transactions recorded.' : `No ${selectedFilter} transactions found.`}</p></div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(e => {
+                html += `<div class="transaction-item"><div class="transaction-icon" style="background: ${categoryColors[e.category]}20;">${categoryIcons[e.category]}</div><div class="transaction-content"><div class="transaction-desc">${e.description}</div><div class="transaction-meta"><span class="transaction-category-tag">${e.category}</span><span class="transaction-date">${e.date}</span></div></div><div class="transaction-right"><span class="transaction-amount">${formatCurrency(e.amount)}</span><button class="delete-btn" onclick="deleteExpense(${e.id})">✕</button></div></div>`;
+            });
+            document.getElementById('transactionsList').innerHTML = html;
+        }
+
+        function init() {
+            loadExpenses();
+            updateDate();
+            setDefaultDate();
+            renderFilterButtons();
+            updateUI();
+            
+            setInterval(saveExpenses, 5000);
+            window.addEventListener('beforeunload', saveExpenses);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
