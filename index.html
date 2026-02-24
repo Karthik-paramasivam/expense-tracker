@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0369a1">
-    <title>ExpenseFlow - Expense Tracker</title>
+    <meta name="theme-color" content="#667eea">
+    <title>ExpenseFlow - Premium Expense Tracker</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { width: 100%; height: 100%; overflow-x: hidden; }
-        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f0f4f8 0%, #f8f9fc 100%); color: #1a202c; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(180deg, #f0f3ff 0%, #f8f9fc 50%, #fdf5ff 100%); color: #1a202c; }
         
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-bottom: none; padding: 16px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2); }
+        .navbar { background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%); border-bottom: none; padding: 16px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25); }
         .nav-container { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 24px; font-weight: 900; color: white; letter-spacing: -1px; }
-        .nav-info { font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 600; }
+        .logo { font-size: 26px; font-weight: 900; color: white; letter-spacing: -1px; text-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav-info { font-size: 12px; color: rgba(255,255,255,0.95); font-weight: 700; }
         
-        .container { padding: 20px; padding-bottom: 30px; }
-        .page-header { margin-bottom: 28px; }
-        .page-title { font-size: 32px; font-weight: 900; color: #0f172a; margin-bottom: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .page-subtitle { font-size: 14px; color: #64748b; font-weight: 500; }
+        .container { padding: 24px; padding-bottom: 40px; max-width: 1200px; margin: 0 auto; }
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-size: 36px; font-weight: 950; color: #0f172a; margin-bottom: 8px; letter-spacing: -1.5px; }
+        .page-subtitle { font-size: 15px; color: #64748b; font-weight: 500; }
         
-        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
-        .kpi-card { background: white; border-radius: 20px; padding: 24px; transition: all 0.3s ease; position: relative; overflow: hidden; animation: slideIn 0.6s ease forwards; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); }
-        .kpi-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; border-radius: 50%; opacity: 0.15; }
-        .kpi-card::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; border-radius: 50%; opacity: 0.1; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 32px; }
+        .kpi-card { background: white; border-radius: 20px; padding: 26px; transition: all 0.3s ease; position: relative; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.08); border: 2px solid rgba(255,255,255,0.8); }
+        .kpi-card::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; opacity: 0.12; }
+        .kpi-card::after { content: ''; position: absolute; bottom: -50px; left: -50px; width: 150px; height: 150px; border-radius: 50%; opacity: 0.08; }
         
         .kpi-card:nth-child(1) { background: linear-gradient(135deg, rgba(102,126,234,0.95) 0%, rgba(118,75,162,0.95) 100%); color: white; }
         .kpi-card:nth-child(1)::before { background: #667eea; }
@@ -43,83 +43,90 @@
         .kpi-card:nth-child(4)::before { background: #43e97b; }
         .kpi-card:nth-child(4)::after { background: #38f9d7; }
         
-        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(0,0,0,0.12); }
-        .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; margin-bottom: 10px; opacity: 0.95; position: relative; z-index: 2; }
-        .kpi-value { font-size: 32px; font-weight: 900; margin-bottom: 6px; letter-spacing: -1px; position: relative; z-index: 2; }
-        .kpi-subtext { font-size: 12px; font-weight: 500; opacity: 0.9; position: relative; z-index: 2; }
+        .kpi-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(102, 126, 234, 0.25); }
+        .kpi-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 900; margin-bottom: 12px; opacity: 0.95; position: relative; z-index: 2; }
+        .kpi-value { font-size: 34px; font-weight: 950; margin-bottom: 8px; letter-spacing: -1px; position: relative; z-index: 2; line-height: 1; }
+        .kpi-subtext { font-size: 13px; font-weight: 600; opacity: 0.9; position: relative; z-index: 2; }
         
-        .card { background: white; border: 1px solid rgba(226,232,240,0.6); border-radius: 18px; padding: 24px; margin-bottom: 20px; animation: slideIn 0.6s ease forwards; box-shadow: 0 4px 20px rgba(0,0,0,0.06); transition: all 0.3s ease; }
-        .card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.1); border-color: rgba(226,232,240,0.9); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #f1f5f9; }
-        .card-title { font-size: 18px; font-weight: 800; color: #0f172a; margin: 0; }
+        .card { background: white; border: 2px solid rgba(226,232,240,0.5); border-radius: 20px; padding: 28px; margin-bottom: 24px; animation: slideIn 0.6s ease forwards; box-shadow: 0 8px 32px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+        .card:hover { box-shadow: 0 12px 48px rgba(0,0,0,0.1); border-color: rgba(226,232,240,0.9); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 3px solid #f1f5f9; }
+        .card-title { font-size: 20px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: -0.5px; }
         
-        .chart-container { position: relative; height: 340px; margin-bottom: 20px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
-        .chart-wrapper { position: relative; height: 280px; }
+        .chart-container { position: relative; height: 420px; margin-bottom: 24px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 18px; padding: 28px; border: 2px solid #e2e8f0; }
+        .chart-wrapper { position: relative; height: 360px; }
         
-        .form-wrapper { display: flex; flex-direction: column; gap: 18px; }
+        .form-wrapper { display: flex; flex-direction: column; gap: 20px; }
         .form-group { margin: 0; width: 100%; }
-        .form-label { display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-input, .form-select { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; display: block; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); background-color: #f8f9fc; }
+        .form-label { display: block; font-size: 13px; font-weight: 800; color: #334155; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.6px; }
+        .form-input, .form-select { width: 100%; padding: 16px 18px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15); background-color: #f8f9fc; }
         .form-input::placeholder { color: #94a3b8; }
         
-        .date-input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; box-sizing: border-box; }
-        .date-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); background-color: #f8f9fc; }
+        .date-input { width: 100%; padding: 16px 18px; border: 2px solid #e2e8f0; border-radius: 14px; font-size: 15px; font-family: inherit; transition: all 0.3s ease; color: #1a202c; background-color: #ffffff; box-sizing: border-box; }
+        .date-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15); background-color: #f8f9fc; }
         
         .date-flex { display: flex; gap: 16px; }
         .date-flex .form-group { flex: 0 0 90%; }
         
-        .form-btn { width: 100%; padding: 14px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
-        .form-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4); }
+        .form-btn { width: 100%; padding: 16px 28px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 900; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 10px 28px rgba(102, 126, 234, 0.3); }
+        .form-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(102, 126, 234, 0.4); }
         .form-btn:active { transform: scale(0.98); }
         
         .breakdown-list { display: flex; flex-direction: column; gap: 12px; }
-        .breakdown-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.3s ease; }
-        .breakdown-item:hover { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); transform: translateX(4px); }
-        .breakdown-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-        .breakdown-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .breakdown-name { font-weight: 700; color: #1a202c; font-size: 13px; }
-        .breakdown-percent { font-size: 11px; color: #64748b; margin-top: 2px; }
-        .breakdown-amount { font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 14px; min-width: 70px; text-align: right; }
+        .breakdown-item { display: flex; align-items: center; justify-content: space-between; padding: 18px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 14px; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .breakdown-item:hover { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); transform: translateX(4px); border-color: #667eea; }
+        .breakdown-left { display: flex; align-items: center; gap: 14px; flex: 1; }
+        .breakdown-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; font-weight: bold; }
+        .breakdown-name { font-weight: 800; color: #1a202c; font-size: 14px; }
+        .breakdown-percent { font-size: 12px; color: #64748b; margin-top: 3px; font-weight: 700; }
+        .breakdown-amount { font-weight: 900; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 15px; min-width: 80px; text-align: right; }
         
-        .filter-container { margin-bottom: 18px; overflow: hidden; }
-        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
-        .filter-btn { padding: 10px 16px; border: 2px solid #e2e8f0; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0; transition: all 0.3s ease; }
-        .filter-btn:hover { border-color: #667eea; color: #667eea; }
-        .filter-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .filter-container { margin-bottom: 20px; overflow: hidden; }
+        .filter-bar { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+        .filter-btn { padding: 11px 18px; border: 2px solid #e2e8f0; background: white; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; flex-shrink: 0; transition: all 0.3s ease; }
+        .filter-btn:hover { border-color: #667eea; color: #667eea; background: rgba(102, 126, 234, 0.05); }
+        .filter-btn.active { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35); }
         
-        .transactions-list { display: flex; flex-direction: column; gap: 12px; }
-        .transaction-item { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.3s ease; }
-        .transaction-item:hover { background: white; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-        .transaction-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-        .transaction-content { display: flex; flex-direction: column; gap: 4px; }
-        .transaction-desc { font-weight: 700; color: #1a202c; font-size: 13px; }
-        .transaction-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .transaction-category-tag { display: inline-block; padding: 4px 10px; background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%); color: #667eea; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; border: 1px solid rgba(102,126,234,0.2); }
-        .transaction-date { font-size: 11px; color: #64748b; white-space: nowrap; font-weight: 600; }
-        .transaction-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .transaction-amount { font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 14px; min-width: 55px; text-align: right; }
-        .delete-btn { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; border: none; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 800; cursor: pointer; flex-shrink: 0; transition: all 0.3s ease; }
-        .delete-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
+        .transactions-list { display: flex; flex-direction: column; gap: 14px; }
+        .transaction-item { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 14px; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .transaction-item:hover { background: white; box-shadow: 0 6px 24px rgba(0,0,0,0.1); border-color: #667eea; }
+        .transaction-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; font-weight: bold; }
+        .transaction-content { display: flex; flex-direction: column; gap: 5px; }
+        .transaction-desc { font-weight: 800; color: #1a202c; font-size: 14px; }
+        .transaction-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .transaction-category-tag { display: inline-block; padding: 5px 12px; background: linear-gradient(135deg, rgba(102,126,234,0.12) 0%, rgba(118,75,162,0.08) 100%); color: #667eea; border-radius: 8px; font-size: 11px; font-weight: 900; white-space: nowrap; border: 2px solid rgba(102,126,234,0.25); }
+        .transaction-date { font-size: 12px; color: #64748b; white-space: nowrap; font-weight: 700; }
+        .transaction-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .transaction-amount { font-weight: 900; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 15px; min-width: 65px; text-align: right; }
+        .delete-btn { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; border: none; border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 900; cursor: pointer; flex-shrink: 0; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15); }
+        .delete-btn:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.25); }
         
-        .empty-state { text-align: center; padding: 40px 20px; }
-        .empty-icon { font-size: 48px; margin-bottom: 16px; }
-        .empty-text { font-size: 13px; color: #64748b; margin: 0; font-weight: 600; }
+        .empty-state { text-align: center; padding: 45px 20px; }
+        .empty-icon { font-size: 54px; margin-bottom: 18px; }
+        .empty-text { font-size: 14px; color: #64748b; margin: 0; font-weight: 700; }
+        
+        .trend-stats { margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 14px; border: 2px solid #e2e8f0; }
+        .trend-stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .trend-stat { text-align: center; padding: 16px; background: white; border-radius: 12px; border: 2px solid #e2e8f0; }
+        .trend-stat-label { font-size: 12px; color: #64748b; font-weight: 900; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+        .trend-stat-value { font-size: 22px; font-weight: 950; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        
+        .trend-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .trend-table th, .trend-table td { padding: 14px 16px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        .trend-table th { background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); font-weight: 900; color: #1a202c; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .trend-table tr:hover { background: rgba(102, 126, 234, 0.05); }
+        .trend-table td { font-weight: 700; color: #1a202c; }
+        .trend-table .amount { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 900; }
         
         @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         
-        @media (max-width: 480px) {
-            .page-title { font-size: 28px; }
-            .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+        @media (max-width: 768px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            .trend-stat-row { grid-template-columns: 1fr; }
             .container { padding: 16px; }
-            .card { padding: 18px; }
-            .chart-container { height: 300px; }
-            .chart-wrapper { height: 240px; }
-        }
-        
-        @supports (padding: max(0px)) {
-            .navbar { padding-top: max(16px, env(safe-area-inset-top)); padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
-            .container { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+            .chart-container { height: 350px; padding: 20px; }
+            .chart-wrapper { height: 300px; }
         }
     </style>
 </head>
@@ -134,7 +141,7 @@
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Financial Overview</h1>
-            <p class="page-subtitle">Track your spending in Rupees</p>
+            <p class="page-subtitle">Premium Expense Tracker - Track & Analyze Your Spending</p>
         </div>
 
         <div class="kpi-grid">
@@ -162,7 +169,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Spending by Category</h2>
+                <h2 class="card-title">💰 Spending by Category</h2>
             </div>
             <div class="chart-container">
                 <div class="chart-wrapper">
@@ -173,7 +180,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Add Transaction</h2>
+                <h2 class="card-title">➕ Add Transaction</h2>
             </div>
             <div class="form-wrapper">
                 <div class="form-group">
@@ -209,7 +216,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Category Breakdown</h2>
+                <h2 class="card-title">📊 Category Breakdown</h2>
             </div>
             <div class="breakdown-list" id="breakdown">
                 <div class="empty-state" style="padding: 20px 0;">
@@ -220,7 +227,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Recent Transactions</h2>
+                <h2 class="card-title">📱 Recent Transactions</h2>
             </div>
             <div class="filter-container">
                 <div class="filter-bar" id="filterBar"></div>
@@ -235,9 +242,10 @@
 
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Spending Trends</h2>
+                <h2 class="card-title">📈 Spending Trends</h2>
             </div>
-            <div style="display: flex; gap: 10px; margin-bottom: 18px; overflow-x: auto;">
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; overflow-x: auto;">
+                <button class="filter-btn" onclick="switchTrendView('daily')" style="flex: 1;">📅 Daily</button>
                 <button class="filter-btn active" onclick="switchTrendView('monthly')" style="flex: 1;">📅 Monthly</button>
                 <button class="filter-btn" onclick="switchTrendView('weekly')" style="flex: 1;">📊 Weekly</button>
                 <button class="filter-btn" onclick="switchTrendView('yearly')" style="flex: 1;">📈 Yearly</button>
@@ -247,22 +255,32 @@
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
-            <div id="trendStats" style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, #f8f9fc 0%, #f1f5f9 100%); border-radius: 12px; border: 1px solid #e2e8f0;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-                    <div style="text-align: center; padding: 12px;">
-                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Highest</div>
-                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="highestTrend">₹0</div>
+            <div class="trend-stats">
+                <div class="trend-stat-row">
+                    <div class="trend-stat">
+                        <div class="trend-stat-label">🔝 Highest</div>
+                        <div class="trend-stat-value" id="highestTrend">₹0</div>
                     </div>
-                    <div style="text-align: center; padding: 12px;">
-                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Average</div>
-                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="avgTrend">₹0</div>
+                    <div class="trend-stat">
+                        <div class="trend-stat-label">📊 Average</div>
+                        <div class="trend-stat-value" id="avgTrend">₹0</div>
                     </div>
-                    <div style="text-align: center; padding: 12px;">
-                        <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Lowest</div>
-                        <div style="font-size: 18px; font-weight: 900; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" id="lowestTrend">₹0</div>
+                    <div class="trend-stat">
+                        <div class="trend-stat-label">📉 Lowest</div>
+                        <div class="trend-stat-value" id="lowestTrend">₹0</div>
                     </div>
                 </div>
             </div>
+            <table class="trend-table" id="trendTable">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="trendTableBody">
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -377,6 +395,23 @@
             document.getElementById('filterBar').innerHTML = html;
         }
 
+        function getDailyTrends() {
+            const trends = {};
+            expenses.forEach(e => {
+                const date = new Date(e.timestamp);
+                const dayKey = date.toISOString().split('T')[0];
+                trends[dayKey] = (trends[dayKey] || 0) + e.amount;
+            });
+            return Object.entries(trends)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .slice(-30)
+                .map(([day, amount]) => {
+                    const date = new Date(day);
+                    const dayName = date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                    return {label: dayName, amount, fullDate: day};
+                });
+        }
+
         function getMonthlyTrends() {
             const trends = {};
             expenses.forEach(e => {
@@ -389,8 +424,8 @@
                 .slice(-12)
                 .map(([month, amount]) => {
                     const [year, monthNum] = month.split('-');
-                    const monthName = new Date(year, monthNum - 1).toLocaleDateString('en-US', {month: 'short'});
-                    return {label: monthName, amount};
+                    const monthName = new Date(year, monthNum - 1).toLocaleDateString('en-US', {month: 'short', year: '2-digit'});
+                    return {label: monthName, amount, fullDate: month};
                 });
         }
 
@@ -410,7 +445,7 @@
                     const date = new Date(week);
                     const endDate = new Date(date);
                     endDate.setDate(endDate.getDate() + 6);
-                    return {label: `${date.getDate()}-${endDate.getDate()} ${date.toLocaleDateString('en-US', {month: 'short'})}`, amount};
+                    return {label: `${date.getDate()}-${endDate.getDate()} ${date.toLocaleDateString('en-US', {month: 'short'})}`, amount, fullDate: week};
                 });
         }
 
@@ -422,17 +457,25 @@
             });
             return Object.entries(trends)
                 .sort((a, b) => a[0].localeCompare(b[0]))
-                .map(([year, amount]) => ({label: year, amount}));
+                .map(([year, amount]) => ({label: year, amount, fullDate: year}));
         }
 
         function updateTrendChart() {
             let trendData = [];
-            if (currentTrendView === 'monthly') trendData = getMonthlyTrends();
+            if (currentTrendView === 'daily') trendData = getDailyTrends();
+            else if (currentTrendView === 'monthly') trendData = getMonthlyTrends();
             else if (currentTrendView === 'weekly') trendData = getWeeklyTrends();
             else trendData = getYearlyTrends();
 
             const labels = trendData.map(t => t.label);
             const data = trendData.map(t => t.amount);
+
+            // Update table
+            let tableHTML = '';
+            trendData.forEach(item => {
+                tableHTML += `<tr><td>${item.label}</td><td style="text-align: right;"><span class="amount">${formatCurrency(item.amount)}</span></td></tr>`;
+            });
+            document.getElementById('trendTableBody').innerHTML = tableHTML;
 
             if (!labels.length) {
                 document.getElementById('highestTrend').textContent = '₹0';
@@ -468,14 +511,15 @@
                             label: 'Spending (₹)',
                             data: data,
                             borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.08)',
-                            borderWidth: 3,
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 4,
                             fill: true,
                             tension: 0.4,
                             pointBackgroundColor: '#667eea',
                             pointBorderColor: '#ffffff',
                             pointBorderWidth: 3,
-                            pointRadius: 6
+                            pointRadius: 7,
+                            pointHoverRadius: 9
                         }]
                     },
                     options: {
@@ -485,10 +529,25 @@
                             legend: {
                                 display: true,
                                 labels: {
-                                    font: { size: 12, family: "'Plus Jakarta Sans'" },
-                                    color: '#64748b',
-                                    padding: 15,
-                                    usePointStyle: true
+                                    font: { size: 14, family: "'Plus Jakarta Sans'", weight: 'bold' },
+                                    color: '#1a202c',
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    boxWidth: 15
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                padding: 16,
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                borderColor: '#667eea',
+                                borderWidth: 2,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹ ' + context.parsed.y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                    }
                                 }
                             }
                         },
@@ -497,17 +556,20 @@
                                 beginAtZero: true,
                                 ticks: {
                                     color: '#64748b',
-                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                    font: { size: 12, family: "'Plus Jakarta Sans'", weight: 'bold' },
+                                    callback: function(value) {
+                                        return '₹' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                    }
                                 },
                                 grid: {
-                                    color: 'rgba(100, 116, 139, 0.1)',
+                                    color: 'rgba(100, 116, 139, 0.12)',
                                     drawBorder: false
                                 }
                             },
                             x: {
                                 ticks: {
                                     color: '#64748b',
-                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                    font: { size: 12, family: "'Plus Jakarta Sans'", weight: 'bold' }
                                 },
                                 grid: { display: false }
                             }
@@ -565,7 +627,7 @@
                             backgroundColor: colors,
                             borderColor: colors,
                             borderWidth: 2,
-                            borderRadius: 10,
+                            borderRadius: 12,
                             borderSkipped: false
                         }]
                     },
@@ -577,11 +639,25 @@
                             legend: {
                                 display: true,
                                 labels: {
-                                    font: { size: 12, family: "'Plus Jakarta Sans'" },
-                                    color: '#64748b',
-                                    padding: 15,
+                                    font: { size: 14, family: "'Plus Jakarta Sans'", weight: 'bold' },
+                                    color: '#1a202c',
+                                    padding: 20,
                                     usePointStyle: true,
-                                    boxWidth: 12
+                                    boxWidth: 15
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                padding: 14,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                borderColor: '#667eea',
+                                borderWidth: 2,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹ ' + context.parsed.x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                    }
                                 }
                             }
                         },
@@ -590,10 +666,13 @@
                                 beginAtZero: true,
                                 ticks: {
                                     color: '#64748b',
-                                    font: { size: 11, family: "'Plus Jakarta Sans'" }
+                                    font: { size: 12, family: "'Plus Jakarta Sans'", weight: 'bold' },
+                                    callback: function(value) {
+                                        return '₹' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                                    }
                                 },
                                 grid: {
-                                    color: 'rgba(100, 116, 139, 0.1)',
+                                    color: 'rgba(100, 116, 139, 0.12)',
                                     drawBorder: false
                                 }
                             },
